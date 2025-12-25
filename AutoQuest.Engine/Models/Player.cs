@@ -4,7 +4,7 @@ public class Player
 {
     private int _health;
     
-    public Player(string name = "Jimmy", 
+    public Player(string name = "Etnad", 
                   int health = 10)
     {
         Name = name;

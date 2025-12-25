@@ -13,6 +13,23 @@ public class GameEngine
     public Player Player { get; protected set; } = new Player();
 
     public int Location { get; protected set; } = 0;
+    public int TickTravel { get; protected set; } = 1;
+    public int Destination { get; protected set; } = 10;
+
+    public void Initialize(Action<string> logger)
+    {
+        logger("[italic gray]Buttering up muses...[/]");
+        TickTravel = 1;
+        
+        logger("[italic gray]Discovering id...[/]");
+        Location = 0;
+        
+        logger("[italic gray]Dereferencing Dante...[/]");
+        Destination = 10;
+        
+        logger("[italic gray]Initiating baryogenesis...[/]");
+        Player = new Player();
+    }
     
     /// <summary>
     /// The main program loop that iterates the game along one tick in game time.
@@ -36,19 +53,12 @@ public class GameEngine
         // }
         #endregion
 
-        // start in origin
-        int startPos = 0;
-        int tickTravel = 1;
-        int destination = 10;
-        Location = startPos;
-        do
-        {
-            logger($"[gray]Player [/][cyan bold]{Player.Name}[/][gray]: H=[/][green bold]{Player.Health}[/][gray], Exp=[/][darkgoldenrod]{Player.Experience}[/]");
+            logger($"Player [cyan bold]{Player.Name}[/]: H=[green bold]{Player.Health}[/], Exp=[blue]{Player.Experience}[/]");
 
             // go to place (determine distance to travel)
             var from = Location;
-            var to = Location + tickTravel;
-            logger($"[gray italic]Moving [yellow]{tickTravel}[/] KM [yellow]{to}[/]...[/]");
+            var to = Location + TickTravel;
+            logger($"[italic]Moving [yellow]{TickTravel}[/] KM to position [yellow]{to}[/]...[/]");
 
             Location = to;
             
@@ -65,18 +75,10 @@ public class GameEngine
             // }
 
             // gain experience/gold
-            // }
+            // 
 
             // rest(?)
             #endregion
-
-        // } until reached destination
-        } while (Player.State != PlayerState.Dead && Location < destination);
-
-        logger(string.Empty);
-        string stateColor = Player.State == PlayerState.Alive ? "green" : "red";
-        logger($"[gray]Player [/][cyan bold]{Player.Name}[/][gray] is [/][{stateColor}]{Player.State}[/][gray]![/]");
-        logger($"[gray]Travelled: [/][yellow bold]{Location}[/][gray] KMs and got [/][blue bold]{Player.Experience}[/][gray] xp![/]");
 
         #region Future features...
         // --------------------------------------
