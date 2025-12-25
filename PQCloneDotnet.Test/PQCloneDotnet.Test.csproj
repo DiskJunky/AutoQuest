@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PGCloneDotnet.Engine\PGCloneDotnet.Engine.csproj" />
+  </ItemGroup>
+
 </Project>

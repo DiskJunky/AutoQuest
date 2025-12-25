@@ -1,15 +1,22 @@
+<<<<<<<< HEAD:PQCloneDotnet.Engine/Engine.cs
 namespace PQCloneDotNet.Engine;
+========
+using System;
+
+namespace PGCloneDotNet.Engine;
+>>>>>>>> develop:PQCloneDotnet.Engine/GameEngine.cs
 
 /// <summary>
 /// This manages the main game elements, takes the game configuration, and progresses
 /// characters.
 /// </summary>
-public class Engine
+public class GameEngine
 {
     /// <summary>
     /// The main program loop that iterates the game along one tick in game time.
     /// </summary>
-    public void DoTick()
+    /// <param name="logger">The method to log status to.</param>
+    public void DoTick(Action<string> logger)
     {
         // roll character
         
