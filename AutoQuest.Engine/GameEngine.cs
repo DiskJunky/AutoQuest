@@ -1,5 +1,7 @@
 using System;
 
+using AutoQuest.Engine.Models;
+
 namespace AutoQuest.Engine;
 
 /// <summary>
@@ -8,14 +10,17 @@ namespace AutoQuest.Engine;
 /// </summary>
 public class GameEngine
 {
+    public Player Player { get; protected set; } = new Player();
+
+    public int Location { get; protected set; } = 0;
+    
     /// <summary>
     /// The main program loop that iterates the game along one tick in game time.
     /// </summary>
     /// <param name="logger">The method to log status to.</param>
     public void DoTick(Action<string> logger)
     {
-        // roll character
-        
+        #region Roll character
         // map story progress {
             // generate story {
                 // Prologue
@@ -29,30 +34,51 @@ public class GameEngine
             
             // determine story point completion criteria?
         // }
-        
-        
+        #endregion
+
         // start in origin
-        // go to place (determine distance to travel)
-        
-        // for each unit travelled [one unit per tick] {
+        int startPos = 0;
+        int tickTravel = 1;
+        int destination = 10;
+        Location = startPos;
+        do
+        {
+            logger($"[gray]Player [/][cyan bold]{Player.Name}[/][gray]: H=[/][green bold]{Player.Health}[/][gray], Exp=[/][darkgoldenrod]{Player.Experience}[/]");
+
+            // go to place (determine distance to travel)
+            var from = Location;
+            var to = Location + tickTravel;
+            logger($"[gray italic]Moving [yellow]{tickTravel}[/] KM [yellow]{to}[/]...[/]");
+
+            Location = to;
+            
+            // for each unit travelled [one unit per tick] {
             // random chance of encounter (50%)
             // if encounter {
-                // do {
-                    // hit/take damage
-                // } until (dead || monster killed)
-                
-                // if (dead) {
-                    // return to origin, lose experience
-                // }
-                
-                // gain experience/gold
-            // }
+            // do {
+            // hit/take damage
+            // } until (dead || monster killed)
             
+            #region Player respawn?
+            // if (dead) {
+            // return to origin, lose experience
+            // }
+
+            // gain experience/gold
+            // }
+
             // rest(?)
+            #endregion
+
         // } until reached destination
-        
-        // print score
-        
+        } while (Player.State != PlayerState.Dead && Location < destination);
+
+        logger(string.Empty);
+        string stateColor = Player.State == PlayerState.Alive ? "green" : "red";
+        logger($"[gray]Player [/][cyan bold]{Player.Name}[/][gray] is [/][{stateColor}]{Player.State}[/][gray]![/]");
+        logger($"[gray]Travelled: [/][yellow bold]{Location}[/][gray] KMs and got [/][blue bold]{Player.Experience}[/][gray] xp![/]");
+
+        #region Future features...
         // --------------------------------------
         // TODOs
         // --------------------------------------
@@ -64,5 +90,6 @@ public class GameEngine
         // * gear system
         // * player buffs/debuffs
         // * player experience/levelling
+        #endregion
     }
 }
