@@ -16,8 +16,9 @@ public static class Program
         var playerStats = new Table().RoundedBorder()
             .BorderColor(Color.White)
             //.Expand()
-            .Title("Player Stats");
-        playerStats.AddColumn(string.Empty);
+            .Title("Player Stats")
+            .HideHeaders();
+        playerStats.AddColumn(string.Empty).Collapse();
         playerStats.AddColumn(string.Empty).Expand();
 
         var player = engine.Player;
@@ -30,14 +31,15 @@ public static class Program
                                         .BorderColor(Color.Gray)
                                         //.Expand()
                                         .Title("Activity");
-        activity.AddColumn("Time");
+        activity.AddColumn("Time").Collapse();
         activity.AddColumn("Message").Expand();
         
         // create the overall layout
         var desktop = new Table().RoundedBorder()
             .BorderColor(Color.Gray)
             .Expand()
-            .Title("Auto-Quest!");
+            .Title("Auto-Quest!")
+            .HideHeaders();
         desktop.AddColumn("");
 
         // add the sub-panels details
@@ -53,7 +55,7 @@ public static class Program
             playerStats.UpdateCell(2, 1, $"[blue bold]{player.Experience}[/]");
             
             // only display the last 5 entries of activity
-            activity.InsertRow(0, $"{DateTime.Now:HH:mm:ss}", message);
+            activity.InsertRow(0, $"{DateTime.Now:HH:mm:ss.fff}", message);
             if (activity.Rows.Count > 5)
             {
                 activity.Rows.RemoveAt(activity.Rows.Count  - 1);

@@ -88,7 +88,7 @@ public class GameEngine
         // 
 
         // rest(?)
-        Thread.Sleep(1000);
+        Thread.Sleep(200);
         #endregion
 
         #region Future features...
