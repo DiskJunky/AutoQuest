@@ -10,6 +10,8 @@ namespace AutoQuest.Engine;
 /// </summary>
 public class GameEngine
 {
+    private readonly Random _random = new Random();
+    
     public Player Player { get; protected set; } = new Player();
 
     public int Location { get; protected set; } = 0;
@@ -24,7 +26,7 @@ public class GameEngine
         logger("[italic gray]Discovering id...[/]");
         Location = 0;
         
-        logger("[italic gray]Dereferencing Dante...[/]");
+        logger("[italic gray]Dereferencing Suissac...[/]");
         Destination = 10;
         
         logger("[italic gray]Initiating baryogenesis...[/]");
@@ -53,34 +55,44 @@ public class GameEngine
         // }
         #endregion
 
-            logger($"Player [cyan bold]{Player.Name}[/]: H=[green bold]{Player.Health}[/], Exp=[blue]{Player.Experience}[/]");
+        //logger($"Player [cyan bold]{Player.Name}[/]: H=[green bold]{Player.Health}[/], Exp=[blue]{Player.Experience}[/]");
 
-            // go to place (determine distance to travel)
-            var from = Location;
-            var to = Location + TickTravel;
-            logger($"[italic]Moving [yellow]{TickTravel}[/] KM to position [yellow]{to}[/]...[/]");
+        // go to place (determine distance to travel)
+        var to = Location + TickTravel;
+        logger($"[italic]Moving [yellow]{TickTravel}[/] KM to position [yellow]{to}[/]...[/]");
+        
+        // for each unit travelled [one unit per tick] {
+        // random chance of encounter (X%)
+        bool encounter = _random.Next(10) <= 3; // 30%
+        if (encounter)
+        {
+            //logger($"[gray italic][cyan]{Player.Name}[/] encountered a monster![/]");
+        }
 
-            Location = to;
-            
-            // for each unit travelled [one unit per tick] {
-            // random chance of encounter (50%)
-            // if encounter {
-            // do {
-            // hit/take damage
-            // } until (dead || monster killed)
-            
-            #region Player respawn?
-            // if (dead) {
-            // return to origin, lose experience
-            // }
+        // only move after encounter is finished
+        // todo: fight state to track of the player is in the middle of something? Player state machine?
+        Location = to;
+        
+        // if encounter {
+        // do {
+        // hit/take damage
+        // } until (dead || monster killed)
 
-            // gain experience/gold
-            // 
+        #region Player respawn?
 
-            // rest(?)
-            #endregion
+        // if (dead) {
+        // return to origin, lose experience
+        // }
+
+        // gain experience/gold
+        // 
+
+        // rest(?)
+        Thread.Sleep(1000);
+        #endregion
 
         #region Future features...
+
         // --------------------------------------
         // TODOs
         // --------------------------------------
@@ -92,6 +104,7 @@ public class GameEngine
         // * gear system
         // * player buffs/debuffs
         // * player experience/levelling
+
         #endregion
     }
 }
