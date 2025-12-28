@@ -75,11 +75,10 @@ public class GameEngine
         // }
         #endregion
 
-        var to = Location;
+        var to = Location + TickTravel;     // potential until after combat...
         if (Player.Mode == PlayerMode.Travel)
         {
             // go to place (determine distance to travel)
-            to = Location + TickTravel;
             logger($"[italic]Moving [yellow]{TickTravel}[/] KM to position [yellow]{to}[/]...[/]");
 
             // for each unit travelled [one unit per tick] {
@@ -104,20 +103,20 @@ public class GameEngine
             Player.Health -= combatantHitDamage;
             combatant.Health -= playerHitDamage;
 
-            logger($"[cyan]{Player.Name}[/][olive]({Player.Health})[/] deals [red]{playerHitDamage}[/] to [darkgoldenrod]{combatant.Name}[/][olive]({combatant.Health})[/]!");
-            logger($"[darkgoldenrod]{combatant.Name}[/][olive]({combatant.Health})[/] deals [red]{combatantHitDamage}[/] to [cyan]{Player.Name}[/][olive]({Player.Health})[/]!");
+            logger($"[cyan]{Player.Name}[/][olive]({Player.Health})[/] deals [red]{playerHitDamage}[/] to [darkgoldenrod]{combatant.Name}[/][olive]({combatant.Health})[/]");
+            logger($"[darkgoldenrod]{combatant.Name}[/][olive]({combatant.Health})[/] deals [red]{combatantHitDamage}[/] to [cyan]{Player.Name}[/][olive]({Player.Health})[/]");
 
             // did anyone die
             if (Player.State == QuiddityState.Dead)
             {
-                logger($"[cyan]{Player.Name}[/] has died :sad:");
+                logger($"[cyan]{Player.Name}[/] has died :(");
                 return;
             }
             if (combatant.State == QuiddityState.Dead)
             {
                 var xp = _random.Next(1, 3);
                 Player.Experience += xp;
-                logger($"[darkgoldenrod]{combatant.Name}[/] is dead! [cyan]{Player.Name}[/] gains [blue]{xp}[/] experience!");
+                logger($"[darkgoldenrod]{combatant.Name}[/] is dead, [cyan]{Player.Name}[/] gains [blue]{xp}[/] experience.");
                 
                 // remove the combatant from the group and continue travelling
                 CombatGroup.Clear();
