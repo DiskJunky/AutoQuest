@@ -62,10 +62,10 @@ namespace AutoQuest.Terminal
             View = engine.View;
 
             // add the player panel
-            var playerStats = new Table().NoBorder();
+            var playerStats = new Table().NoBorder()
+                                         .HideHeaders();
             playerStats.AddColumn(new TableColumn("Field"));
             playerStats.AddColumn(new TableColumn("Value"));
-            //playerStats.AddColumns(2);
 
             var player = engine.View.Player;
             playerStats.AddRow("Name:", BuildPlayerName);
