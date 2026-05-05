@@ -1,4 +1,5 @@
 ﻿using AutoQuest.Engine;
+using AutoQuest.Engine.Models;
 
 using Spectre.Console;
 
@@ -9,7 +10,8 @@ public static class Program
     public static void Main(string[] args)
     {
         // load
-        var engine = new GameEngine();
+        var gameView = new GameView();
+        var engine = new GameEngine(gameView);
         Render(engine);
     }
 
@@ -24,7 +26,7 @@ public static class Program
         var playerStats = new Grid();
         playerStats.AddColumns(2);
 
-        var player = engine.Player;
+        var player = engine.View.Player;
         playerStats.AddRow("Name:", $"[cyan bold]{player.Name}[/]");
         playerStats.AddRow("Health:", $"[green bold]{player.Health}[/]");
         playerStats.AddRow("Exp.:", $"[blue bold]{player.Experience}[/]");
@@ -90,7 +92,7 @@ public static class Program
         
                 // kick the engine...
                 engine.Initialize(Log);
-                player = engine.Player;
+                player = engine.View.Player;
         
                 // render the display
                 ctx.Refresh();
@@ -104,7 +106,7 @@ public static class Program
                 
                 string stateColor = player.State == QuiddityState.Alive ? "green" : "red";
                 Log($"[gray]Player [/][cyan bold]{player.Name}[/][olive]({player.Health})[/][gray] is [/][{stateColor}]{player.State}[/][gray]![/]");
-                Log($"[gray]Travelled: [/][yellow bold]{engine.Location}[/][gray] KMs and got [/][blue bold]{player.Experience}[/][gray] xp![/]");
+                Log($"[gray]Travelled: [/][yellow bold]{engine.View.Location}[/][gray] KMs and got [/][blue bold]{player.Experience}[/][gray] xp![/]");
             
                 // only display the last 5 entries of activity
                 if (activity.Rows.Count > 5)
