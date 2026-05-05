@@ -17,7 +17,6 @@ public static class Program
         
         // render the UI
         var ui = new PresentationEngine();
-        ui.Initialize();
         ui.Render(engine);
     }
 }

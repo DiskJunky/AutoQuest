@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 using AutoQuest.Engine;
 using AutoQuest.Engine.Models;
@@ -59,13 +62,15 @@ namespace AutoQuest.Terminal
             View = engine.View;
 
             // add the player panel
-            var playerStats = new Grid();
-            playerStats.AddColumns(2);
+            var playerStats = new Table().NoBorder();
+            playerStats.AddColumn(new TableColumn("Field"));
+            playerStats.AddColumn(new TableColumn("Value"));
+            //playerStats.AddColumns(2);
 
             var player = engine.View.Player;
-            playerStats.AddRow("Name:", $"[cyan bold]{player.Name}[/]");
-            playerStats.AddRow("Health:", $"[green bold]{player.Health}[/]");
-            playerStats.AddRow("Exp.:", $"[blue bold]{player.Experience}[/]");
+            playerStats.AddRow("Name:", BuildPlayerName);
+            playerStats.AddRow("Health:", BuildPlayerHealth);
+            playerStats.AddRow("Exp.:", BuildPlayerExp);
 
             var playerPnl = new Panel(playerStats).Header("Player").RoundedBorder();
 
@@ -98,6 +103,10 @@ namespace AutoQuest.Terminal
             var refresh = new Action<LiveDisplayContext>(ctx =>
             {
                 BuildActivityLog(activity);
+                playerStats.Rows.Update(0, 1, new Markup(BuildPlayerName));
+                playerStats.Rows.Update(1, 1, new Markup(BuildPlayerHealth));
+                playerStats.Rows.Update(2, 1, new Markup(BuildPlayerExp));
+
                 ctx.Refresh();
             });
 
@@ -153,6 +162,11 @@ namespace AutoQuest.Terminal
         #endregion
 
         #region Private Methods
+
+        private string BuildPlayerName => $"[cyan bold]{View.Player.Name}[/]";
+        private string BuildPlayerHealth => $"[green bold]{View.Player.Health}[/]";
+        private string BuildPlayerExp => $"[blue bold]{View.Player.Experience}[/]";
+
         /// <summary>
         /// This will build and display the last X entries from the activity log.
         /// </summary>
@@ -160,11 +174,9 @@ namespace AutoQuest.Terminal
         private void BuildActivityLog(Table activity)
         {
             var logItemColor = Color.Silver;
-            int newestBrightness = logItemColor.R;      // gray has the same value for each R, G, and B, so we only need one channel
-            int oldestBrightness = 40;
-
-            // calculate the message width
             var messageWidth = AnsiConsole.Profile.Width - 27;
+            var minDimness = 0.2f;      // 0=dark, 1=bright
+            var dimnessRange = 1 - minDimness;
 
             // get the most recent logs from newest to oldest, up to the max number of logs to display
             var logs = View.GetLatestActivityLogs(MaxDisplayedActivityLogs);
@@ -173,18 +185,23 @@ namespace AutoQuest.Terminal
             {
                 if (displayRow < logs.Count)
                 {
-                    // fade the date/time as the logs get older to visually represent the ordering
-                    int scale = newestBrightness - (displayRow * ((newestBrightness - oldestBrightness) / MaxDisplayedActivityLogs));
+                    // the top of the row should be bright and we want to fade to the background as each
+                    // log item is older.
+                    float rowDimness = (displayRow * (dimnessRange / MaxDisplayedActivityLogs));
 
                     // check for multi-line messages
                     var log = logs[displayRow];
                     var message = EscapeMessage(log.Message, messageWidth);
+                    message = ColorizeMessage(message, rowDimness);
+
+                    // calculate the color for this row based on the age of the log item
+                    var rowColor = CalculateColor(logItemColor, AnsiConsole.Background, rowDimness);
 
                     // add the row item
                     var dateText = log.Timestamp.ToString(ActivityLog.DateTimeFormat);
-                    var markupText = $"[rgb({scale},{scale},{scale})]{dateText}[/]";
-                    activity.AddRow(new Markup(markupText, logItemColor),
-                                    new Markup(message, logItemColor));
+                    var markupText = ColorizeMessage(dateText, rowDimness);
+                    activity.AddRow(new Markup(markupText, rowColor),
+                                    new Markup(message, rowColor));
                 }
                 else
                 {
@@ -192,6 +209,88 @@ namespace AutoQuest.Terminal
                     activity.AddEmptyRow();
                 }
             }
+        }
+
+        /// <summary>
+        /// A static list of named colors that SpectreConsole provides/supports. This is used to parse color names
+        /// out of the log messages and convert them to actual RGB values that we can then dim based on the age of
+        /// the log item.
+        /// </summary>
+        static readonly Dictionary<string, Color> SpectreColors =
+            typeof(Color)
+                .GetProperties(BindingFlags.Public | BindingFlags.Static)
+                .Where(f => f.PropertyType == typeof(Color))
+                .ToDictionary(
+                              f => f.Name,
+                              f => (Color)f.GetValue(null)!,
+                              StringComparer.OrdinalIgnoreCase
+                             );
+
+        /// <summary>
+        /// This will process the bbcode-style color tags in the message and convert them to use RGB values that are
+        /// dimmed based on the provided dimness factor. This allows us to have the log messages fade out as they get
+        /// older, while still respecting any color tags that were included in the original message.
+        /// </summary>
+        /// <param name="message">The message to scan for color codes.</param>
+        /// <param name="dimness">The dimness factor to apply to the colors.</param>
+        /// <returns>The colorized message.</returns>
+        private string ColorizeMessage(string message, float dimness = 1f)
+        {
+
+            var regex = new Regex(@"\[(?<content>[^\]/][^\]]*)\]",
+                                  RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            return regex.Replace(message, match =>
+            {
+
+                var content = match.Groups["content"].Value;
+
+                // Split tokens on whitespace
+                var tokens = content
+                             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                             .ToList();
+
+                // Find the first token that matches a Spectre color
+                var colorIndex = tokens.FindIndex(t => SpectreColors.ContainsKey(t));
+                if (colorIndex < 0)
+                    return match.Value; // no color found → unchanged
+
+                var colorName = tokens[colorIndex];
+
+                // if we don't have a color match, just use what was specified
+                if (!SpectreColors.TryGetValue(colorName, out var color))
+                    return match.Value; // unknown → leave as-is
+
+                // if the dimness is outside our expected range, just use the color as-is
+                if (dimness > 1f || dimness < 0f)
+                    return match.Value;
+
+                // calculate the rbg value using the starting and ending color ranges
+                var dimmedColor = CalculateColor(color, AnsiConsole.Background, dimness);
+
+                // Replace ONLY the color token
+                tokens[colorIndex] = $"rgb({dimmedColor.R},{dimmedColor.G},{dimmedColor.B})";
+
+                return $"[{string.Join(' ', tokens)}]";
+            });
+        }
+
+        /// <summary>
+        /// Calculates the RGB values for a color that is somewhere between the provided start and end colors based on the
+        /// supplied <paramref name="dimness"/> value, where 0 represents the start color and 1 represents the end color.
+        /// </summary>
+        /// <param name="start">The starting color.</param>
+        /// <param name="end">The ending color.</param>
+        /// <param name="dimness">The dimness factor, where 0 is the start color and 1 is the end color.</param>
+        /// <returns>The calculated color.</returns>
+        private Color CalculateColor(Color start, Color end, float dimness)
+        {
+            var calcChannel = new Func<int, int, float, byte>((s, e, b) => (byte)(s + ((e - s) * b)));
+            return new Color(
+                calcChannel(start.R, end.R, dimness),
+                calcChannel(start.G, end.G, dimness),
+                calcChannel(start.B, end.B, dimness)
+            );
         }
 
         /// <summary>

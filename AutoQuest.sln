@@ -9,13 +9,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoQuest.Engine", "AutoQue
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoQuest.Test", "AutoQuest.Test\AutoQuest.Test.csproj", "{5B0CCF69-BE2D-4504-B9C5-71D25872E0CF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{E097F7FD-E4DD-4908-899B-6FD3162E6A8F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\images\Sample.png = docs\images\Sample.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E73FE6EA-C45E-4B67-992E-409382B6797B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +42,15 @@ Global
 		{5B0CCF69-BE2D-4504-B9C5-71D25872E0CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B0CCF69-BE2D-4504-B9C5-71D25872E0CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B0CCF69-BE2D-4504-B9C5-71D25872E0CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
+		{E097F7FD-E4DD-4908-899B-6FD3162E6A8F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9BDCE20A-C667-4236-912D-6D63E7EC418A}
 	EndGlobalSection
 EndGlobal

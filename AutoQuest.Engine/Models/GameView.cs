@@ -80,18 +80,6 @@ namespace AutoQuest.Engine.Models
             IsDirty = true;
         }
 
-        ///// <summary>
-        ///// This will log the specified message to the activity collection for recording/display.
-        ///// </summary>
-        ///// <param name="state">The state to put the application into.</param>
-        ///// <param name="message">The message to display.</param>
-        ///// <param name="args">Any arguments to format <paramref name="message"/> with.</param>
-        //public void Log(ApplicationState state, string message, params object[] args)
-        //{
-        //    State = state;
-        //    Log(message, args);
-        //}
-
         /// <summary>
         /// This will log the specified message to the activity collection for recording/display.
         /// </summary>
