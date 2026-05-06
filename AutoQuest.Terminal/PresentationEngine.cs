@@ -21,8 +21,9 @@ namespace AutoQuest.Terminal
     /// <summary>
     /// This class is used to manage and render the game's various UI elements.
     /// </summary>
-    public class PresentationEngine
+    public class PresentationEngine(GameView view)
     {
+
         #region Private Fields
         private const int MaxDisplayedActivityLogs = 15;
         private const int UiCycleSpeed = 200;       // milliseconds
@@ -32,7 +33,7 @@ namespace AutoQuest.Terminal
         /// <summary>
         /// Gets the game view that contains the current state of the game to be rendered by the presentation engine.
         /// </summary>
-        public GameView View { get; private set; }
+        public GameView View { get; private set; } = view;
         #endregion
 
         #region Methods
