@@ -16,7 +16,7 @@ public static class Program
         var engine = new GameEngine(gameView);
         
         // render the UI
-        var ui = new PresentationEngine();
+        var ui = new PresentationEngine(gameView);
         ui.Render(engine);
     }
 }
