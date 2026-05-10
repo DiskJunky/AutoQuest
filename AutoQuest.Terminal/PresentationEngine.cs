@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -217,15 +218,13 @@ namespace AutoQuest.Terminal
         /// out of the log messages and convert them to actual RGB values that we can then dim based on the age of
         /// the log item.
         /// </summary>
-        static readonly Dictionary<string, Color> SpectreColors =
+        private static readonly Hashtable SpectreColors = new Hashtable(
             typeof(Color)
                 .GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Where(f => f.PropertyType == typeof(Color))
-                .ToDictionary(
-                              f => f.Name,
+                .ToDictionary(f => f.Name,
                               f => (Color)f.GetValue(null)!,
-                              StringComparer.OrdinalIgnoreCase
-                             );
+                              StringComparer.OrdinalIgnoreCase));
 
         /// <summary>
         /// This will process the bbcode-style color tags in the message and convert them to use RGB values that are
@@ -259,8 +258,10 @@ namespace AutoQuest.Terminal
                 var colorName = tokens[colorIndex];
 
                 // if we don't have a color match, just use what was specified
-                if (!SpectreColors.TryGetValue(colorName, out var color))
+                if (!SpectreColors.ContainsKey(colorName))
                     return match.Value; // unknown → leave as-is
+
+                var color = (Color)SpectreColors[colorName];
 
                 // if the dimness is outside our expected range, just use the color as-is
                 if (dimness > 1f || dimness < 0f)
