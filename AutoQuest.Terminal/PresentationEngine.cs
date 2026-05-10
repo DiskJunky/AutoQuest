@@ -222,7 +222,7 @@ namespace AutoQuest.Terminal
             typeof(Color)
                 .GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Where(f => f.PropertyType == typeof(Color))
-                .ToDictionary(f => f.Name,
+                .ToDictionary(f => f.Name.ToLower(),
                               f => (Color)f.GetValue(null)!,
                               StringComparer.OrdinalIgnoreCase));
 
@@ -251,7 +251,7 @@ namespace AutoQuest.Terminal
                              .ToList();
 
                 // Find the first token that matches a Spectre color
-                var colorIndex = tokens.FindIndex(t => SpectreColors.ContainsKey(t));
+                var colorIndex = tokens.FindIndex(t => SpectreColors.ContainsKey(t.ToLower()));
                 if (colorIndex < 0)
                     return match.Value; // no color found → unchanged
 
@@ -305,7 +305,7 @@ namespace AutoQuest.Terminal
         {
             // strip down to a single line of multiple
             var lines = message.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            message = lines[0];    // we can only deal with the first
+            message = lines[0]; // we can only deal with the first
 
             // ensure we don't exceed the message column width
             if (message.Length > messageWidth)
@@ -329,12 +329,16 @@ namespace AutoQuest.Terminal
             {
                 // Fallback: escape and render as plain text
                 message = message.Replace("[Red]", string.Empty)
-                                 .Replace("[/]", string.Empty);
+                    .Replace("[/]", string.Empty);
                 message = $"[{Color.Red}]{Markup.Escape(message)}[/]";
             }
+            catch (Exception e)
+            {
+                AnsiConsole.WriteLine("[red]Error![/]\n[yellow]Line:[/] {message}\n[Red]{e}[/]");
+            }
 
-            // return the UI-safe message
-            return message;
+        // return the UI-safe message
+        return message;
         }
         #endregion
     }
